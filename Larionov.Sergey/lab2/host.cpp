@@ -303,17 +303,17 @@ private:
                 pending_.insert(entry.first);
             }
         }
-        const auto players = static_cast<int>(pending_.size());
+        roundPlayers_ = static_cast<int>(pending_.size());
         roundRunning_ = true;
         ++round_;
         status_->setText(QStringLiteral("Ход %1 · ожидание чисел козлят").arg(round_));
         log(QStringLiteral("Ход %1 · волк: %2 (%3) · участников: %4")
                 .arg(round_).arg(wolf)
                 .arg(automatic ? QStringLiteral("случайно") : QStringLiteral("вручную"))
-                .arg(players));
+                .arg(roundPlayers_));
         for (const auto id : pending_) {
             auto& client = clients_.at(id);
-            client.worker->play(Turn{round_, wolf, players, client.alive});
+            client.worker->play(Turn{round_, wolf, roundPlayers_, client.alive});
         }
     }
 
@@ -356,10 +356,7 @@ private:
             dead += !isAlive(result.outcome);
             log(QStringLiteral("Козлёнок %1: %2 · %3").arg(id).arg(result.number).arg(label));
         }
-        const bool anyAlive = std::any_of(clients_.begin(), clients_.end(), [](const auto& entry) {
-            return entry.second.ready && entry.second.alive;
-        });
-        allDeadRounds_ = anyAlive || dead == 0 ? 0 : allDeadRounds_ + 1;
+        allDeadRounds_ = dead == roundPlayers_ ? allDeadRounds_ + 1 : 0;
         results_.clear();
         log(QStringLiteral("Спрятались: %1 · попались: %2 · мертвы: %3 · воскресли: %4")
                 .arg(hidden).arg(caught).arg(dead).arg(revived));
@@ -395,6 +392,7 @@ private:
     std::mt19937 random_{std::random_device{}()};
     int nextId_ = 1;
     int round_ = 0;
+    int roundPlayers_ = 0;
     int allDeadRounds_ = 0;
     bool roundRunning_ = false;
     bool finished_ = false;
