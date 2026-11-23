@@ -1,4 +1,4 @@
-transports := $(basename $(wildcard conn_*.cpp conn_*.c))
+transports := $(basename $(notdir $(wildcard src/conn_*.cpp src/conn_*.c)))
 types := $(patsubst conn_%,%,$(transports))
 
 .PHONY: all clean

@@ -10,12 +10,12 @@ find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Threads REQUIRED)
 
 file(GLOB sources CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/*.c")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/*.c")
 file(GLOB transports CONFIGURE_DEPENDS
-    "${CMAKE_CURRENT_SOURCE_DIR}/conn_*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/conn_*.c")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/conn_*.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/src/conn_*.c")
 list(REMOVE_ITEM sources ${transports}
-    "${CMAKE_CURRENT_SOURCE_DIR}/host.cpp"
-    "${CMAKE_CURRENT_SOURCE_DIR}/client.cpp")
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/host.cpp"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/client.cpp")
 
 if(sources)
     add_library(lab_common OBJECT ${sources})
@@ -34,7 +34,7 @@ foreach(transport IN LISTS transports)
 
     foreach(role IN ITEMS host client)
         set(target "${role}_${type}")
-        add_executable("${target}" "${role}.cpp")
+        add_executable("${target}" "src/${role}.cpp")
         target_compile_options("${target}" PRIVATE -Wall -Werror)
         target_link_libraries("${target}" PRIVATE "${name}" Threads::Threads)
         if(TARGET lab_common)
